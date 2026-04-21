@@ -9,8 +9,6 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
 
     steps:
     - name: Checkout Repository
@@ -35,15 +33,15 @@ jobs:
     - name: Build Folia Server
       run: |
         chmod +x gradlew
-        # Применяем патчи
+        # Сначала обязательно применяем патчи
         ./gradlew applyAllPatches --no-configuration-cache
-        # Используем актуальную команду для сборки JAR
-        ./gradlew :folia-server:reobfJar --no-configuration-cache -x test
+        # Затем запускаем общую сборку. 
+        # Это самый надежный способ, если точное имя задачи неизвестно.
+        ./gradlew build --no-configuration-cache -x test
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: folia-1.21.11-server
-        # Путь к файлу тоже немного меняется в зависимости от версии, 
-        # этот вариант захватит нужный файл:
-        path: folia-server/build/libs/folia-server-*.jar
+        # Здесь мы ищем готовый JAR во всех подпапках сборки
+        path: "**/build/libs/*.jar"
