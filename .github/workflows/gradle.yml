@@ -27,12 +27,17 @@ jobs:
     - name: Setup Gradle
       uses: gradle/actions/setup-gradle@v4
 
+    - name: Configure Git
+      run: |
+        git config --global user.email "actions@github.com"
+        git config --global user.name "GitHub Actions"
+
     - name: Build Folia Server
       run: |
         chmod +x gradlew
-        # Применяем все патчи (API и Server)
+        # Сначала применяем патчи
         ./gradlew applyAllPatches --no-configuration-cache
-        # Собираем готовый JAR, пропуская тесты и кэш конфигурации
+        # Затем собираем сервер
         ./gradlew :folia-server:createReobfBundledJar --no-configuration-cache -x test
 
     - name: Upload Artifact
