@@ -33,15 +33,21 @@ jobs:
     - name: Build Folia Server
       run: |
         chmod +x gradlew
-        # Сначала обязательно применяем патчи
+        # 1. Применяем патчи Folia к исходникам Minecraft
         ./gradlew applyAllPatches --no-configuration-cache
-        # Затем запускаем общую сборку. 
-        # Это самый надежный способ, если точное имя задачи неизвестно.
+        
+        # 2. Собираем проект. Команда build создаст все необходимые JAR файлы.
+        # Мы используем флаг -x test, чтобы не тратить время на проверку тестов.
         ./gradlew build --no-configuration-cache -x test
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: folia-1.21.11-server
-        # Здесь мы ищем готовый JAR во всех подпапках сборки
-        path: "**/build/libs/*.jar"
+        # Этот блок ищет JAR-файлы во всех возможных папках, где они могут появиться
+        path: |
+          Folia-Server/build/libs/*.jar
+          folia-server/build/libs/*.jar
+          build/libs/*.jar
+        # Если файлы не будут найдены, сборка выдаст ошибку, и мы узнаем об этом
+        if-no-files-found: error
