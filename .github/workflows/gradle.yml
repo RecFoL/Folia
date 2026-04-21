@@ -35,13 +35,15 @@ jobs:
     - name: Build Folia Server
       run: |
         chmod +x gradlew
-        # Сначала применяем патчи
+        # Применяем патчи
         ./gradlew applyAllPatches --no-configuration-cache
-        # Затем собираем сервер
-        ./gradlew :folia-server:createReobfBundledJar --no-configuration-cache -x test
+        # Используем актуальную команду для сборки JAR
+        ./gradlew :folia-server:reobfJar --no-configuration-cache -x test
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: folia-1.21.11-server
-        path: folia-server/build/libs/*.jar
+        # Путь к файлу тоже немного меняется в зависимости от версии, 
+        # этот вариант захватит нужный файл:
+        path: folia-server/build/libs/folia-server-*.jar
